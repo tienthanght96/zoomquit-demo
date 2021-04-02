@@ -1,0 +1,61 @@
+$primary-color: white;
+$bg: black;
+h1 {
+  color: $primary-color;
+  background-color: $bg;
+}
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+body {
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+@mixin fixViewPort {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+
+#mainSection {
+  height: 100%;
+  width: 100%;
+  @include fixViewPort;
+  z-index: 1;
+}
+#loading {
+  @include fixViewPort;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .loading-progress {
+    z-index: 1;
+    background-color: rgba(#bbb, 0.4);
+    display: inline-block;
+    position: relative;
+    border-radius: 0.2rem;
+    height: 1.2rem;
+    width: 220px;
+    &__value {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 1.2rem;
+      background-color: #bbb;
+      z-index: 2;
+      position: absolute;
+      border-radius: 0.2rem;
+      left: -0;
+    }
+  }
+}
