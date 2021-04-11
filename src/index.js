@@ -3,7 +3,6 @@ import './styles.scss'
 import gsap from 'gsap'
 ;(function () {
   const canvas = document.getElementById('canvas')
-  let scale = 1
   let index = 0
 
   let context = null
@@ -12,7 +11,6 @@ import gsap from 'gsap'
   const loadingElement = document.getElementById('loading')
   let timer = 0
   let loopImages = []
-  let lastWidth = 0
 
   let screenWidth = window.innerWidth
   let screenHeight = window.innerHeight
@@ -72,45 +70,47 @@ import gsap from 'gsap'
   }
 
   function initLoop() {
+    let scale = 1
+
     for (let i = 0; i < images.length; i++) {
       var w = screenWidth
       var h = screenHeight
+      var ratio = h / w
 
       loopImages.push({
         width: w,
         height: h,
         image: images[i],
-        ratio: h / w,
+        ratio,
+        scale,
       })
+
+      const width = w * scale
+      const height = h * scale
+      const { x, y } = calculateCenterPos(width, height)
+      context.drawImage(images[i], x, y, width, height)
+      scale *= 0.5
     }
   }
 
   function loopZoomImage() {
     context.clearRect(0, 0, screenWidth, screenHeight)
-    timer += 10
-    const currentItem = loopImages[index]
-    let width = currentItem.width + timer
-    let height = currentItem.height + timer * currentItem.ratio
+    for (let i = index; i < index + 4; i++) {
+      const element = loopImages[i]
+      const width = element.width * element.scale + timer * element.scale
+      const height =
+        element.height * element.scale + timer * element.ratio * element.scale
+      const { x, y } = calculateCenterPos(width, height)
+      context.drawImage(element.image, x, y, width, height)
 
-    const nextFrameWidth = (width + timer) * 1.25
-
-    if (lastWidth === nextFrameWidth) {
-      const nextFrameWidth = (width + timer) * 1.25
-      const nextItem = loopImages[index + 1 > loopImages.length ? 0 : index + 1]
-      const { x: x2, y: y2 } = calculateCenterPos(nextFrameWidth, height)
-      context.drawImage(nextItem.image, x2, y2, nextFrameWidth, height)
-    } else {
-      const { x: x1, y: y1 } = calculateCenterPos(width, height)
-      context.drawImage(currentItem.image, x1, y1, width, height)
-    }
-
-    if (width > screenWidth * 1.25) {
-      index += 1
-      timer = 0
-    }
-
-    if (index > loopImages.length) {
-      index = 0
+      if (width > screenWidth * 2) {
+        index += 1
+      }
+      if (index > loopImages.length) {
+        index = 0
+      }
+      timer += 5
+      timer += timer * 0.003
     }
 
     window.requestAnimationFrame(loopZoomImage)
